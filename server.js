@@ -36,6 +36,29 @@ function isAllowedOrigin(origin) {
 }
 
 app.use(
+  (req, res, next) => {
+    const origin = req.headers.origin;
+
+    if (isAllowedOrigin(origin)) {
+      if (origin) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+      }
+      res.setHeader('Vary', 'Origin');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+    }
+
+    if (req.method === 'OPTIONS') {
+      res.sendStatus(204);
+      return;
+    }
+
+    next();
+  },
+);
+
+app.use(
   cors({
     origin(origin, callback) {
       if (isAllowedOrigin(origin)) {
@@ -48,6 +71,7 @@ app.use(
     credentials: true,
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 204,
   }),
 );
 app.use(express.json({ limit: '1mb' }));
