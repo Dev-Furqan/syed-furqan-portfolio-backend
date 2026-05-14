@@ -10,6 +10,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const API_VERSION = '2026-05-14-railway-cors-db-v2';
 const DEFAULT_CLIENT_URLS = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
@@ -81,6 +82,7 @@ app.get('/', (req, res) => {
   res.status(200).json({
     status: 'ok',
     service: 'portfolio-api',
+    version: API_VERSION,
   });
 });
 
@@ -88,6 +90,7 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'ok',
     service: 'portfolio-api',
+    version: API_VERSION,
     database: mongoose.connection.readyState === 1 ? 'connected' : 'not_connected',
     timestamp: new Date().toISOString(),
   });

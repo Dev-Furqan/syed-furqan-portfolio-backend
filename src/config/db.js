@@ -9,6 +9,8 @@ export default async function connectDB(uri) {
 
   const connection = await mongoose.connect(uri, {
     autoIndex: process.env.NODE_ENV !== 'production',
+    connectTimeoutMS: 8000,
+    serverSelectionTimeoutMS: 8000,
   });
 
   console.log(`MongoDB connected: ${connection.connection.host}`);
