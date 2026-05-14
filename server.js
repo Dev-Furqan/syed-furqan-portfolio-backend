@@ -10,6 +10,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const HOST = '0.0.0.0';
 const API_VERSION = '2026-05-14-railway-cors-db-v2';
 const DEFAULT_CLIENT_URLS = [
   'http://localhost:5173',
@@ -109,7 +110,7 @@ async function connectDatabase() {
   }
 }
 
-app.listen(PORT, () => {
-  console.log(`Portfolio API running on port ${PORT}`);
+app.listen(PORT, HOST, () => {
+  console.log(`Portfolio API running on ${HOST}:${PORT}`);
   connectDatabase();
 });
