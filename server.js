@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
+import mongoose from 'mongoose';
 import connectDB from './src/config/db.js';
 import contactRoutes from './src/routes/contact.routes.js';
 import { notFound, errorHandler } from './src/middleware/error.middleware.js';
@@ -20,10 +21,18 @@ app.use(
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    service: 'portfolio-api',
+  });
+});
+
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'ok',
     service: 'portfolio-api',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'not_connected',
     timestamp: new Date().toISOString(),
   });
 });
@@ -32,14 +41,16 @@ app.use('/api/contact', contactRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-async function startServer() {
-  await connectDB(process.env.MONGODB_URI);
-  app.listen(PORT, () => {
-    console.log(`Portfolio API running on port ${PORT}`);
-  });
+async function connectDatabase() {
+  try {
+    await connectDB(process.env.MONGODB_URI);
+  } catch (error) {
+    console.error('MongoDB connection failed:', error.message);
+    console.error('API is running, but contact form storage needs MONGODB_URI/Atlas access fixed.');
+  }
 }
 
-startServer().catch((error) => {
-  console.error('Failed to start server:', error.message);
-  process.exit(1);
+app.listen(PORT, () => {
+  console.log(`Portfolio API running on port ${PORT}`);
+  connectDatabase();
 });
